@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automata Simulator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">A</div>
+    <div>
+      <h1>Automata Simulator</h1>
+      <p>DFA, NFA, ε-NFA, PDA, and Turing Machine in one unified workspace</p>
+    </div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="dfa">DFA <span class="tab-badge">Unit 1</span></button>
+    <button class="tab-btn" data-tab="nfa">NFA <span class="tab-badge">Unit 1</span></button>
+    <button class="tab-btn" data-tab="enfa">ε-NFA <span class="tab-badge">Unit 1</span></button>
+    <button class="tab-btn" data-tab="pda">PDA <span class="tab-badge">Unit 4</span></button>
+    <button class="tab-btn" data-tab="tm">TM <span class="tab-badge">Unit 5</span></button>
+  </nav>
+
+  <main>
+    <section class="tab-panel active" id="dfa-panel">
+      <div class="stats-row">
+        <div class="stat-card purple"><div class="label">States</div><div class="value" id="dfa-stat-states">0</div></div>
+        <div class="stat-card blue"><div class="label">Alphabet</div><div class="value" id="dfa-stat-alpha">0</div></div>
+        <div class="stat-card"><div class="label">Input Progress</div><div class="value" id="dfa-stat-pos">0/0</div></div>
+        <div class="stat-card green"><div class="label">Current State</div><div class="value" id="dfa-stat-state">—</div></div>
+      </div>
+
+      <div class="desc-card" id="dfa-desc"></div>
+      <div class="result-banner" id="dfa-result"></div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="dfa-machine-select">Machine</label>
+          <select id="dfa-machine-select"></select>
+        </div>
+        <div class="input-group">
+          <label for="dfa-input">Test input</label>
+          <input type="text" id="dfa-input" placeholder="Test input" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="dfa-step">▶ Step</button>
+        <button class="btn btn-success" id="dfa-run">▶▶ Run</button>
+        <button class="btn btn-ghost" id="dfa-reset">↺ Reset</button>
+        <div class="speed-row">
+          <span>Speed</span>
+          <input type="range" id="dfa-speed" min="100" max="1000" value="500" />
+        </div>
+      </div>
+
+      <div class="tape-display" id="dfa-tape"></div>
+
+      <div class="sim-grid">
+        <div class="card">
+          <div class="card-title">State Diagram</div>
+          <div class="diagram-wrap" id="dfa-diagram"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Transition Table</div>
+          <div class="trans-table-wrap">
+            <table>
+              <thead>
+                <tr><th>State</th><th>Symbol</th><th>Next</th><th>Active</th></tr>
+              </thead>
+              <tbody id="dfa-trans-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Execution Log</div>
+        <div class="log-wrap" id="dfa-log"></div>
+      </div>
+
+      <div class="designer-section">
+        <h3>Design your own DFA</h3>
+        <p>Fill fields, add transition rows, and click Save &amp; load machine.</p>
+
+        <div class="designer-grid">
+          <div class="form-group"><label>Name</label><input id="dfa-d-name" type="text" placeholder="My DFA" /></div>
+          <div class="form-group"><label>States (comma-separated)</label><input id="dfa-d-states" type="text" placeholder="q0,q1,q2" /></div>
+          <div class="form-group"><label>Start state</label><input id="dfa-d-start" type="text" placeholder="q0" /></div>
+          <div class="form-group"><label>Accept states (comma-separated)</label><input id="dfa-d-accept" type="text" placeholder="q2" /></div>
+          <div class="form-group"><label>Test input</label><input id="dfa-d-input" type="text" placeholder="abba" /></div>
+        </div>
+
+        <div class="trans-editor">
+          <div class="trans-editor-header">
+            <span>Transitions: State | Symbol | Next state</span>
+            <button class="btn btn-sm btn-ghost" id="dfa-designer-add">+ Add row</button>
+          </div>
+          <div id="dfa-trans-rows"></div>
+        </div>
+
+        <div class="designer-actions">
+          <button class="btn btn-ghost" id="dfa-designer-prefill">Prefill from selected machine</button>
+          <button class="btn btn-primary" id="dfa-designer-save">Save &amp; load machine</button>
+          <button class="btn btn-danger" id="dfa-designer-delete">Delete selected</button>
+          <div class="designer-msg" id="dfa-designer-msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="nfa-panel">
+      <div class="stats-row">
+        <div class="stat-card purple"><div class="label">States</div><div class="value" id="nfa-stat-states">0</div></div>
+        <div class="stat-card blue"><div class="label">Active States</div><div class="value" id="nfa-stat-active">0</div></div>
+        <div class="stat-card"><div class="label">Input Progress</div><div class="value" id="nfa-stat-pos">0/0</div></div>
+        <div class="stat-card"><div class="label">Transitions</div><div class="value" id="nfa-stat-trans">0</div></div>
+      </div>
+
+      <div class="desc-card" id="nfa-desc"></div>
+      <div class="result-banner" id="nfa-result"></div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="nfa-machine-select">Machine</label>
+          <select id="nfa-machine-select"></select>
+        </div>
+        <div class="input-group">
+          <label for="nfa-input">Test input</label>
+          <input type="text" id="nfa-input" placeholder="Test input" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="nfa-step">▶ Step</button>
+        <button class="btn btn-success" id="nfa-run">▶▶ Run</button>
+        <button class="btn btn-ghost" id="nfa-reset">↺ Reset</button>
+        <div class="speed-row">
+          <span>Speed</span>
+          <input type="range" id="nfa-speed" min="100" max="1000" value="500" />
+        </div>
+      </div>
+
+      <div class="tape-display" id="nfa-tape"></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">Active State Set</div>
+        <div class="state-set" id="nfa-active-states"></div>
+      </div>
+
+      <div class="sim-grid">
+        <div class="card">
+          <div class="card-title">State Diagram</div>
+          <div class="diagram-wrap" id="nfa-diagram"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Transition Table</div>
+          <div class="trans-table-wrap">
+            <table>
+              <thead>
+                <tr><th>State</th><th>Symbol</th><th>Next States</th></tr>
+              </thead>
+              <tbody id="nfa-trans-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Execution Log</div>
+        <div class="log-wrap" id="nfa-log"></div>
+      </div>
+
+      <div class="designer-section">
+        <h3>Design your own NFA</h3>
+        <p>Use comma-separated next states in each transition row.</p>
+
+        <div class="designer-grid">
+          <div class="form-group"><label>Name</label><input id="nfa-d-name" type="text" placeholder="My NFA" /></div>
+          <div class="form-group"><label>States (comma-separated)</label><input id="nfa-d-states" type="text" placeholder="q0,q1,q2" /></div>
+          <div class="form-group"><label>Start state</label><input id="nfa-d-start" type="text" placeholder="q0" /></div>
+          <div class="form-group"><label>Accept states (comma-separated)</label><input id="nfa-d-accept" type="text" placeholder="q2" /></div>
+          <div class="form-group"><label>Test input</label><input id="nfa-d-input" type="text" placeholder="abba" /></div>
+        </div>
+
+        <div class="trans-editor">
+          <div class="trans-editor-header">
+            <span>Transitions: State | Symbol | Next states</span>
+            <button class="btn btn-sm btn-ghost" id="nfa-designer-add">+ Add row</button>
+          </div>
+          <div id="nfa-trans-rows"></div>
+        </div>
+
+        <div class="designer-actions">
+          <button class="btn btn-ghost" id="nfa-designer-prefill">Prefill from selected machine</button>
+          <button class="btn btn-primary" id="nfa-designer-save">Save &amp; load machine</button>
+          <button class="btn btn-danger" id="nfa-designer-delete">Delete selected</button>
+          <div class="designer-msg" id="nfa-designer-msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="enfa-panel">
+      <div class="stats-row">
+        <div class="stat-card purple"><div class="label">States</div><div class="value" id="enfa-stat-states">0</div></div>
+        <div class="stat-card blue"><div class="label">Active States</div><div class="value" id="enfa-stat-active">0</div></div>
+        <div class="stat-card"><div class="label">Input Progress</div><div class="value" id="enfa-stat-pos">0/0</div></div>
+        <div class="stat-card"><div class="label">Transitions</div><div class="value" id="enfa-stat-trans">0</div></div>
+      </div>
+
+      <div class="desc-card" id="enfa-desc"></div>
+      <div class="result-banner" id="enfa-result"></div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="enfa-machine-select">Machine</label>
+          <select id="enfa-machine-select"></select>
+        </div>
+        <div class="input-group">
+          <label for="enfa-input">Test input</label>
+          <input type="text" id="enfa-input" placeholder="Test input" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="enfa-step">▶ Step</button>
+        <button class="btn btn-success" id="enfa-run">▶▶ Run</button>
+        <button class="btn btn-ghost" id="enfa-reset">↺ Reset</button>
+        <div class="speed-row">
+          <span>Speed</span>
+          <input type="range" id="enfa-speed" min="100" max="1000" value="500" />
+        </div>
+      </div>
+
+      <div class="tape-display" id="enfa-tape"></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-title">ε-Closure Active Set</div>
+        <div class="state-set" id="enfa-active-states"></div>
+      </div>
+
+      <div class="sim-grid">
+        <div class="card">
+          <div class="card-title">State Diagram</div>
+          <div class="diagram-wrap" id="enfa-diagram"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Transition Table</div>
+          <div class="trans-table-wrap">
+            <table>
+              <thead>
+                <tr><th>State</th><th>Symbol</th><th>Next States</th></tr>
+              </thead>
+              <tbody id="enfa-trans-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Execution Log</div>
+        <div class="log-wrap" id="enfa-log"></div>
+      </div>
+
+      <div class="designer-section">
+        <h3>Design your own ε-NFA</h3>
+        <p>Use ε in the symbol column for epsilon transitions.</p>
+
+        <div class="designer-grid">
+          <div class="form-group"><label>Name</label><input id="enfa-d-name" type="text" placeholder="My ε-NFA" /></div>
+          <div class="form-group"><label>States (comma-separated)</label><input id="enfa-d-states" type="text" placeholder="q0,q1,q2" /></div>
+          <div class="form-group"><label>Start state</label><input id="enfa-d-start" type="text" placeholder="q0" /></div>
+          <div class="form-group"><label>Accept states (comma-separated)</label><input id="enfa-d-accept" type="text" placeholder="q2" /></div>
+          <div class="form-group"><label>Test input</label><input id="enfa-d-input" type="text" placeholder="abba" /></div>
+        </div>
+
+        <div class="trans-editor">
+          <div class="trans-editor-header">
+            <span>Transitions: State | Symbol (ε allowed) | Next states</span>
+            <button class="btn btn-sm btn-ghost" id="enfa-designer-add">+ Add row</button>
+          </div>
+          <div id="enfa-trans-rows"></div>
+        </div>
+
+        <div class="designer-actions">
+          <button class="btn btn-ghost" id="enfa-designer-prefill">Prefill from selected machine</button>
+          <button class="btn btn-primary" id="enfa-designer-save">Save &amp; load machine</button>
+          <button class="btn btn-danger" id="enfa-designer-delete">Delete selected</button>
+          <div class="designer-msg" id="enfa-designer-msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="pda-panel">
+      <div class="stats-row">
+        <div class="stat-card purple"><div class="label">Current State</div><div class="value" id="pda-stat-state">—</div></div>
+        <div class="stat-card blue"><div class="label">Stack Size</div><div class="value" id="pda-stat-stack">0</div></div>
+        <div class="stat-card"><div class="label">Input Progress</div><div class="value" id="pda-stat-pos">0/0</div></div>
+        <div class="stat-card green"><div class="label">Stack Top</div><div class="value" id="pda-stat-top">—</div></div>
+      </div>
+
+      <div class="desc-card" id="pda-desc"></div>
+      <div class="result-banner" id="pda-result"></div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="pda-machine-select">Machine</label>
+          <select id="pda-machine-select"></select>
+        </div>
+        <div class="input-group">
+          <label for="pda-input">Test input</label>
+          <input type="text" id="pda-input" placeholder="Test input" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="pda-step">▶ Step</button>
+        <button class="btn btn-success" id="pda-run">▶▶ Run</button>
+        <button class="btn btn-ghost" id="pda-reset">↺ Reset</button>
+        <div class="speed-row">
+          <span>Speed</span>
+          <input type="range" id="pda-speed" min="100" max="1000" value="500" />
+        </div>
+      </div>
+
+      <div class="tape-display" id="pda-tape"></div>
+
+      <div class="sim-grid pda-grid">
+        <div class="card">
+          <div class="card-title">State Diagram</div>
+          <div class="diagram-wrap" id="pda-diagram"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Transition Table</div>
+          <div class="trans-table-wrap">
+            <table>
+              <thead>
+                <tr><th>State</th><th>Input</th><th>Pop</th><th>Push</th><th>Next</th></tr>
+              </thead>
+              <tbody id="pda-trans-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Stack</div>
+          <div id="pda-stack" class="stack-wrap"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Execution Log</div>
+        <div class="log-wrap" id="pda-log"></div>
+      </div>
+
+      <div class="designer-section">
+        <h3>Design your own PDA</h3>
+        <p>Use ε for empty input checks. Push accepts comma-separated symbols.</p>
+
+        <div class="designer-grid">
+          <div class="form-group"><label>Name</label><input id="pda-d-name" type="text" placeholder="My PDA" /></div>
+          <div class="form-group"><label>States (comma-separated)</label><input id="pda-d-states" type="text" placeholder="q0,q1,q2" /></div>
+          <div class="form-group"><label>Start state</label><input id="pda-d-start" type="text" placeholder="q0" /></div>
+          <div class="form-group"><label>Accept states (comma-separated)</label><input id="pda-d-accept" type="text" placeholder="q2" /></div>
+          <div class="form-group"><label>Start stack symbol</label><input id="pda-d-stack" type="text" placeholder="$" /></div>
+          <div class="form-group"><label>Test input</label><input id="pda-d-input" type="text" placeholder="aaabbb" /></div>
+        </div>
+
+        <div class="trans-editor">
+          <div class="trans-editor-header">
+            <span>Transitions: State | Input | Pop | Push | Next state</span>
+            <button class="btn btn-sm btn-ghost" id="pda-designer-add">+ Add row</button>
+          </div>
+          <div id="pda-trans-rows"></div>
+        </div>
+
+        <div class="designer-actions">
+          <button class="btn btn-ghost" id="pda-designer-prefill">Prefill from selected machine</button>
+          <button class="btn btn-primary" id="pda-designer-save">Save &amp; load machine</button>
+          <button class="btn btn-danger" id="pda-designer-delete">Delete selected</button>
+          <div class="designer-msg" id="pda-designer-msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tm-panel">
+      <div class="stats-row">
+        <div class="stat-card purple"><div class="label">Current State</div><div class="value" id="tm-stat-state">—</div></div>
+        <div class="stat-card blue"><div class="label">Head Position</div><div class="value" id="tm-stat-pos">0</div></div>
+        <div class="stat-card"><div class="label">Steps</div><div class="value" id="tm-stat-steps">0</div></div>
+        <div class="stat-card green"><div class="label">Head Symbol</div><div class="value" id="tm-stat-head">_</div></div>
+      </div>
+
+      <div class="desc-card" id="tm-desc"></div>
+      <div class="result-banner" id="tm-result"></div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="tm-machine-select">Machine</label>
+          <select id="tm-machine-select"></select>
+        </div>
+        <div class="input-group">
+          <label for="tm-input">Test input</label>
+          <input type="text" id="tm-input" placeholder="Test input" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="tm-step">▶ Step</button>
+        <button class="btn btn-success" id="tm-run">▶▶ Run</button>
+        <button class="btn btn-ghost" id="tm-reset">↺ Reset</button>
+        <div class="speed-row">
+          <span>Speed</span>
+          <input type="range" id="tm-speed" min="100" max="1000" value="500" />
+        </div>
+      </div>
+
+      <div class="tape-display tm-tape-display" id="tm-tape"></div>
+
+      <div class="sim-grid">
+        <div class="card">
+          <div class="card-title">State Diagram</div>
+          <div class="diagram-wrap" id="tm-diagram"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Transition Table</div>
+          <div class="trans-table-wrap">
+            <table>
+              <thead>
+                <tr><th>State</th><th>Read</th><th>Write</th><th>Move</th><th>Next</th></tr>
+              </thead>
+              <tbody id="tm-trans-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Execution Log</div>
+        <div class="log-wrap" id="tm-log"></div>
+      </div>
+
+      <div class="designer-section">
+        <h3>Design your own Turing Machine</h3>
+        <p>Add transitions as: State | Read | Write | Move (L or R) | Next state.</p>
+
+        <div class="designer-grid">
+          <div class="form-group"><label>Name</label><input id="tm-d-name" type="text" placeholder="My TM" /></div>
+          <div class="form-group"><label>States (comma-separated)</label><input id="tm-d-states" type="text" placeholder="q0,q1,qA,qR" /></div>
+          <div class="form-group"><label>Start state</label><input id="tm-d-start" type="text" placeholder="q0" /></div>
+          <div class="form-group"><label>Accept states (comma-separated)</label><input id="tm-d-accept" type="text" placeholder="qA" /></div>
+          <div class="form-group"><label>Reject state</label><input id="tm-d-reject" type="text" placeholder="qR" /></div>
+          <div class="form-group"><label>Test input</label><input id="tm-d-input" type="text" placeholder="1011" /></div>
+        </div>
+
+        <div class="trans-editor">
+          <div class="trans-editor-header">
+            <span>Transitions: State | Read | Write | Move | Next state</span>
+            <button class="btn btn-sm btn-ghost" id="tm-designer-add">+ Add row</button>
+          </div>
+          <div id="tm-trans-rows"></div>
+        </div>
+
+        <div class="designer-actions">
+          <button class="btn btn-ghost" id="tm-designer-prefill">Prefill from selected machine</button>
+          <button class="btn btn-primary" id="tm-designer-save">Save &amp; load machine</button>
+          <button class="btn btn-danger" id="tm-designer-delete">Delete selected</button>
+          <div class="designer-msg" id="tm-designer-msg"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="diagram.js"></script>
+  <script src="dfa.js"></script>
+  <script src="nfa.js"></script>
+  <script src="enfa.js"></script>
+  <script src="pda.js"></script>
+  <script src="tm.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const simulators = {};
+      const simulatorFactories = {
+        dfa: function () { return new DFASimulator(); },
+        nfa: function () { return new NFASimulator(); },
+        enfa: function () { return new ENFASimulator(); },
+        pda: function () { return new PDASimulator(); },
+        tm: function () { return new TMSimulator(); },
+      };
+
+      Object.keys(simulatorFactories).forEach(function (key) {
+        try {
+          simulators[key] = simulatorFactories[key]();
+        } catch (err) {
+          console.error('Failed to initialize simulator:', key, err);
+          const panel = document.getElementById(key + '-panel');
+          const btn = document.querySelector('.tab-btn[data-tab="' + key + '"]');
+          if (btn) btn.disabled = true;
+          if (panel) {
+            const msg = document.createElement('div');
+            msg.className = 'result-banner reject show';
+            msg.textContent = 'Initialization error in this tab. Check browser console for details.';
+            panel.prepend(msg);
+          }
+        }
+      });
+
+      const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
+      const tabPanels = Array.from(document.querySelectorAll('.tab-panel'));
+
+      function activateTab(tabKey) {
+        tabButtons.forEach(function (btn) {
+          btn.classList.toggle('active', btn.dataset.tab === tabKey);
+        });
+        tabPanels.forEach(function (panel) {
+          panel.classList.toggle('active', panel.id === tabKey + '-panel');
+        });
+
+        Object.keys(simulators).forEach(function (key) {
+          if (key !== tabKey && simulators[key] && typeof simulators[key].stop === 'function') {
+            simulators[key].stop();
+          }
+        });
+
+        const sim = simulators[tabKey];
+        if (sim && typeof sim.renderAll === 'function') sim.renderAll();
+      }
+
+      tabButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activateTab(btn.dataset.tab);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
